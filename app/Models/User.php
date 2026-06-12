@@ -49,23 +49,19 @@ class User extends Authenticatable
         ];
 
     }
-
-
-    // --- RELATIONSHIPS (Jo aapko data nikalne mein madad karenge) ---
-
-    // Ek user ki ek hi provider profile hogi
+  
     public function providerProfile()
     {
         return $this->hasOne(ProviderProfile::class);
     }
 
-    // Ek provider multiple services bana sakta hai
+   
     public function services()
     {
         return $this->hasMany(Service::class);
     }
 
-    // Ek customer multiple requests bhej sakta hai
+
     public function serviceRequests()
     {
         return $this->hasMany(ServiceRequest::class, 'customer_id');
