@@ -21,7 +21,9 @@ class AuthService
             ]);
 
             
-            $user->assignRole('customer');      
+            $user->assignRole($data['role']);      
+
+            $token = $user->createToken('auth_token')->plainTextToken;
 
             
             event(new UserRegistered($user));
@@ -29,4 +31,23 @@ class AuthService
             return $user;
         });
     }
+
+    public function login(array $data)
+    {
+    
+        if (!Auth::attempt(['email' => $data['email'], 'password' => $data['password']])) {
+            return false; 
+        }
+
+        $user = User::where('email', $data['email'])->first();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return [
+            'user' => $user,
+            'token' => $token,
+            'role' => $user->roles->pluck('name')[0] ?? 'customer'
+        ];
+    }
 }
+

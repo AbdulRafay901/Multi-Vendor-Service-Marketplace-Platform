@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\RegisterRequest;
 use App\Services\AuthService;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -27,5 +30,26 @@ class AuthController extends Controller
             'access_token' => $token,
             'user' => $user
         ], 201);
+    }
+
+    public function login(LoginRequest $request)
+    {
+        // Service ko validated data pass karo
+        $result = $this->authService->login($request->validated());
+
+        // Agar result false aaya (credentials ghalat hain)
+        if (!$result) {
+            return response()->json([
+                'message' => 'Email ya password ghalat hai.'
+            ], 401); // 401 Unauthorized
+        }
+
+        // Agar login successful ho gaya
+        return response()->json([
+            'message' => 'Login successful',
+            'access_token' => $result['token'],
+            'role' => $result['role'],
+            'user' => $result['user']
+        ], 200);
     }
 }

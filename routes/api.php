@@ -12,9 +12,11 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/register', [AuthController::class, 'register']);
 
-Route::post('/service-requests', [ServiceRequestController::class, 'store']);
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function(){
+
+    Route::post('/service-requests', [ServiceRequestController::class, 'store']);
 
     Route::middleware('role:provider')->group(function(){
         Route::post('/service', [ServiceController::class, 'store']);
