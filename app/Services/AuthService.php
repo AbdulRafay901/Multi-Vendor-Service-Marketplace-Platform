@@ -46,7 +46,7 @@ class AuthService
         return [
             'user' => $user,
             'token' => $token,
-            'role' => $user->roles->pluck('name')[0] ?? 'customer'
+            'role' => $user->role
         ];
     }
 }

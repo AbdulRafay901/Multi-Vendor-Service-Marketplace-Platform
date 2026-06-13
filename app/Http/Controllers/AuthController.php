@@ -34,17 +34,16 @@ class AuthController extends Controller
 
     public function login(LoginRequest $request)
     {
-        // Service ko validated data pass karo
+        
         $result = $this->authService->login($request->validated());
 
-        // Agar result false aaya (credentials ghalat hain)
+        
         if (!$result) {
             return response()->json([
                 'message' => 'Email ya password ghalat hai.'
-            ], 401); // 401 Unauthorized
+            ], 401); 
         }
 
-        // Agar login successful ho gaya
         return response()->json([
             'message' => 'Login successful',
             'access_token' => $result['token'],
