@@ -21,7 +21,7 @@ class AuthService
             ]);
 
             
-            $user->assignRole('customer');
+            $user->assignRole('customer');      
 
             
             event(new UserRegistered($user));
