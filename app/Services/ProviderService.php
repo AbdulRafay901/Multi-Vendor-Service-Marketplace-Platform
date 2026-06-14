@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\ServiceRequest;  
+use Exception;
 
 class ProviderService
 {
@@ -19,5 +20,26 @@ class ProviderService
             ]) 
             ->orderBy('created_at', 'desc')
             ->get();
+    }
+
+    public function updateOrderStatus($requestId, $providerId, $newStatus)
+    {
+    
+        $order = ServiceRequest::with('service')->find($requestId);
+
+        if (!$order) {
+            throw new Exception("Order nahi mila.");
+        }
+
+        // STRICT CHECK
+        if ($order->service->user_id !== $providerId) {
+            throw new Exception("Aap sirf apne orders ka status update kar sakte hain.");
+        }
+
+    
+        $order->status = $newStatus;
+        $order->save();
+
+        return $order;
     }
 }

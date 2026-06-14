@@ -6,15 +6,21 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\ProviderController;    
+use App\Http\Controllers\ProviderController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
+
+// Public Api ---------------------- Start
 
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/login', [AuthController::class, 'login']);
+
+Route::get('/services', [ServiceController::class, 'index']);
+
+// Public Api ---------------------- End
 
 Route::middleware('auth:sanctum')->group(function(){
 
@@ -25,5 +31,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::middleware('role:provider')->group(function(){
         Route::post('/service', [ServiceController::class, 'store']);
         Route::get('/provider/requests', [ProviderController::class, 'getMyRequests']);
+        
+        Route::patch('/provider/requests/{id}/status', [ProviderController::class, 'updateStatus']);
     });
 });
