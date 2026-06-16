@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Services\ProviderService;
 use App\Http\Requests\UpdateOrderStatusRequest;
+use App\Models\User;
 use Exception;
 
 class ProviderController extends Controller
@@ -48,5 +49,20 @@ class ProviderController extends Controller
                 'error' => $e->getMessage()
             ], 403);
         }
+    }
+    public function getProfile($id)
+    {
+        
+        $provider = User::with('services')
+            ->withAvg('reviews', 'rating') 
+            ->findOrFail($id);
+
+        return response()->json([
+            'message' => 'Provider profile fetched successfully',
+            'data' => [
+                'provider' => $provider,
+                'average_rating' => round($provider->reviews_avg_rating, 2) 
+            ]
+        ], 200);
     }
 }

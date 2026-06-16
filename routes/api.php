@@ -20,6 +20,8 @@ Route::post('/login', [AuthController::class, 'login']);
 
 Route::get('/services', [ServiceController::class, 'index']);
 
+Route::get('/provider/profile/{id}', [ProviderController::class, 'getProfile']);
+
 // Public Api ---------------------- End
 
 Route::middleware('auth:sanctum')->group(function(){
