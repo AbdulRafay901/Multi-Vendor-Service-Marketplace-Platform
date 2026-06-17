@@ -1,8 +1,8 @@
-import { useState } from 'react'; // State handle karne ke liye (Menu open/close)
+import { useState } from 'react'; // State (Menu open/close)
 import { Link } from 'react-router-dom';
 
 function Navbar() {
-  // Mobile menu ko open aur close karne ke liye state
+  // Mobile menu  open state
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -17,7 +17,7 @@ function Navbar() {
             </Link>
           </div>
 
-          {/* 2. Center: Desktop Links (md:flex ka matlab hai desktop par dikhega, mobile par hidden) */}
+          {/* 2. Center: Desktop Links (md:flex ka matlab hai desktop par dikhega, mobile hidden) */}
           <div className="hidden md:flex items-center space-x-8 font-medium text-gray-600">
             <Link to="/" className="hover:text-indigo-600 transition-colors">Home</Link>
             <Link to="/services" className="hover:text-indigo-600 transition-colors">Services</Link>
@@ -26,7 +26,7 @@ function Navbar() {
             <a href="#" className="hover:text-indigo-600 transition-colors">About</a>
           </div>
 
-          {/* 3. Right Side: Desktop Buttons (Mobile par hidden) */}
+          {/* 3. Right Side: Desktop Buttons (Mobile hidden) */}
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/login" className="px-4 py-2 text-gray-700 font-medium hover:text-indigo-600 transition-colors">
               Login
@@ -36,7 +36,7 @@ function Navbar() {
             </button>
           </div>
 
-          {/* 4. Mobile Menu Button (md:hidden ka matlab hai desktop par chup jayega, mobile par dikhega) */}
+          {}
           <div className="md:hidden flex items-center">
             <button 
               onClick={() => setIsOpen(!isOpen)} 
@@ -44,10 +44,10 @@ function Navbar() {
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isOpen ? (
-                  // Cross (X) Icon jab menu khula ho
+                  
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  // Hamburger Icon (3 lines) jab menu band ho
+                  
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
@@ -57,7 +57,7 @@ function Navbar() {
         </div>
       </div>
 
-      {/* 5. Mobile Menu Drawer (Conditional Rendering: Sirf tabhi dikhega jab isOpen true hoga) */}
+      {}
       {isOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 px-4 pt-2 pb-4 space-y-1 shadow-lg absolute w-full left-0 z-40">
           <Link to="/" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Home</Link>

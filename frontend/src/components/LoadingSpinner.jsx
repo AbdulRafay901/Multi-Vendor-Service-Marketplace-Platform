@@ -1,0 +1,10 @@
+import React from 'react';
+
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center h-64">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-600"></div>
+    <p className="ml-3 text-gray-600 font-medium">Services loading...</p>
+  </div>
+);
+
+export default LoadingSpinner;
