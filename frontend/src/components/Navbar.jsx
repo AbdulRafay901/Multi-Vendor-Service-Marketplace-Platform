@@ -1,84 +1,39 @@
-import { useState } from 'react'; // State (Menu open/close)
+import React from 'react';
 import { Link } from 'react-router-dom';
 
-function Navbar() {
-  // Mobile menu  open state
-  const [isOpen, setIsOpen] = useState(false);
-
+const Navbar = () => {
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
+    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          
-          {/* 1. Left Side: Logo */}
-          <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-extrabold text-indigo-600 tracking-tight">
-              Service<span className="text-gray-900">Hub</span>
-            </Link>
+        <div className="flex justify-between h-16 items-center">
+          {/* Logo */}
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-black text-indigo-600 tracking-tight flex items-center gap-1">
+              <span className="bg-indigo-600 text-white p-1 rounded-lg text-sm">S</span>ServiceHub
+            </span>
           </div>
 
-          {/* 2. Center: Desktop Links (md:flex ka matlab hai desktop par dikhega, mobile hidden) */}
-          <div className="hidden md:flex items-center space-x-8 font-medium text-gray-600">
-            <Link to="/" className="hover:text-indigo-600 transition-colors">Home</Link>
-            <Link to="/services" className="hover:text-indigo-600 transition-colors">Services</Link>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center gap-6 text-sm font-semibold text-gray-600">
+            <a href="#" className="text-indigo-600 border-b-2 border-indigo-600 pb-1">Home</a>
+            <a href="#" className="hover:text-indigo-600 transition-colors">Services</a>
             <a href="#" className="hover:text-indigo-600 transition-colors">Categories</a>
             <a href="#" className="hover:text-indigo-600 transition-colors">How It Works</a>
             <a href="#" className="hover:text-indigo-600 transition-colors">About</a>
+            <a href="#" className="hover:text-indigo-600 transition-colors">Contact</a>
           </div>
 
-          {/* 3. Right Side: Desktop Buttons (Mobile hidden) */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/login" className="px-4 py-2 text-gray-700 font-medium hover:text-indigo-600 transition-colors">
-              Login
-            </Link>
-            <button className="px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-all shadow-sm">
+          {/* User Section / Buttons */}
+          <div className="flex items-center gap-3">
+            <button className="text-sm font-bold text-gray-700 hover:text-indigo-600 px-3 py-2">Login</button>
+            <button className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold px-4 py-2 rounded-xl shadow-sm transition-all">
               Register
             </button>
           </div>
-
-          {}
-          <div className="md:hidden flex items-center">
-            <button 
-              onClick={() => setIsOpen(!isOpen)} 
-              className="text-gray-600 hover:text-indigo-600 focus:outline-none"
-            >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                {isOpen ? (
-                  
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                ) : (
-                  
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-                )}
-              </svg>
-            </button>
-          </div>
-
         </div>
       </div>
-
-      {}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t border-gray-100 px-4 pt-2 pb-4 space-y-1 shadow-lg absolute w-full left-0 z-40">
-          <Link to="/" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Home</Link>
-          <Link to="/services" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Services</Link>
-          <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Categories</a>
-          <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">How It Works</a>
-          <a href="#" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">About</a>
-          
-          {/* Mobile Auth Buttons */}
-          <div className="pt-4 border-t border-gray-100 flex flex-col space-y-2">
-            <Link to="/login" onClick={() => setIsOpen(false)} className="w-full text-center py-2 text-gray-700 font-medium hover:text-indigo-600">
-              Login
-            </Link>
-            <button className="w-full py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 shadow-sm">
-              Register
-            </button>
-          </div>
-        </div>
-      )}
     </nav>
   );
-}
+};
 
 export default Navbar;
