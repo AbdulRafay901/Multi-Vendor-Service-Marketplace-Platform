@@ -1,87 +1,104 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 const ServiceDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [service, setService] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  // Temporary simple data link karne ke liye
-  const serviceSample = {
-    title: "High-Converting Multi-Vendor Laravel Marketplace Website",
-    category: "Web Development",
-    price: "150",
-    delivery_time: "5",
-    description: "Main aapke liye ek mukammal responsive multi-vendor marketplace website banaon ga Laravel aur MySQL ka istemal karte hue. Isme admin panel, vendor dashboard aur product listing ke saare basic features shamil honge.",
-    provider: "Al-Raza Tech"
-  };
+  // API se single service fetch karna
+  useEffect(() => {
+    const fetchService = async () => {
+      try {
+        const response = await fetch(`http://127.0.0.1:8000/api/services/${id}`);
+        const result = await response.json();
+        if (response.ok) {
+          setService(result.data);
+        }
+      } catch (error) {
+        console.error("Error fetching service:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchService();
+  }, [id]);
+
+  if (loading) return <div className="text-center py-20">Loading Service Details...</div>;
+
+  if (!service) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center text-center px-4">
+        <span className="text-3xl">⚠️</span>
+        <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider mt-2">Listing Record Unavailable</h2>
+        <button 
+          onClick={() => navigate('/services')}
+          className="mt-4 bg-indigo-600 text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-xl"
+        >
+          Return to Marketplace
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      
-      {/* Back Button */}
-      <button 
-        onClick={() => navigate('/services')}
-        className="text-sm font-bold text-indigo-600 hover:underline mb-6 block"
-      >
-        ← Back to Services
-      </button>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="text-xs font-bold text-gray-400 uppercase tracking-wider flex gap-2 mb-6 text-left">
+        <span className="hover:text-indigo-600 cursor-pointer" onClick={() => navigate('/')}>Home</span>
+        <span>/</span>
+        <span className="hover:text-indigo-600 cursor-pointer" onClick={() => navigate('/services')}>Services</span>
+        <span>/</span>
+        <span className="text-gray-900">{service.category}</span>
+      </div>
 
-      {/* Main Grid: Left side text, Right side price card */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        {/* Left Column: Info */}
-        <div className="md:col-span-2 space-y-4">
-          <span className="text-xs bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full font-bold uppercase">
-            {serviceSample.category}
-          </span>
-          
-          <h1 className="text-2xl md:text-3xl font-black text-gray-900 leading-tight">
-            {serviceSample.title}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">
+        <div className="lg:col-span-2 space-y-6">
+          <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight leading-tight">
+            {service.title}
           </h1>
 
-          <p className="text-sm text-gray-500 font-medium">
-            Service Provider: <span className="text-gray-800 font-bold">{serviceSample.provider}</span>
-          </p>
-
-          {/* Simple Image Placeholder */}
-          <div className="w-full h-64 bg-gray-200 rounded-xl overflow-hidden">
-            <img 
-              src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80" 
-              alt="Service"
-              className="w-full h-full object-cover"
-            />
+          <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100 w-fit">
+            {/* Provider Name Initial */}
+            <div className="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center font-black text-xs text-white uppercase">
+              {service.provider?.name ? service.provider.name[0] : 'U'}
+            </div>
+            <div>
+              <h4 className="text-xs font-black text-gray-900">{service.provider?.name || 'Unknown Provider'}</h4>
+            </div>
           </div>
 
-          {/* Description */}
-          <div className="pt-4">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Description</h3>
-            <p className="text-sm text-gray-650 leading-relaxed bg-gray-50 p-4 rounded-xl border border-gray-150">
-              {serviceSample.description}
+          <img 
+            src={`http://127.0.0.1:8000/storage/${service.image}`} 
+            alt={service.title} 
+            className="w-full h-80 sm:h-96 object-cover rounded-2xl border border-gray-100 shadow-sm"
+          />
+
+          <div className="space-y-3">
+            <h3 className="text-base font-black text-gray-900 uppercase tracking-wider">About This Service</h3>
+            <p className="text-sm text-gray-500 leading-relaxed font-medium">
+              {service.description}
             </p>
           </div>
         </div>
 
-        {/* Right Column: Pricing Box */}
-        <div className="h-fit bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
-          <div className="flex justify-between items-center mb-4">
-            <span className="text-sm text-gray-500 font-bold">Price</span>
-            <span className="text-2xl font-black text-indigo-600">${serviceSample.price}</span>
-          </div>
+        {/* Purchase Widget */}
+        <div className="space-y-6">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm sticky top-24">
+            <div className="flex justify-between items-center border-b border-gray-100 pb-4 mb-4">
+              <span className="text-xs font-black text-gray-900 uppercase tracking-widest">Price</span>
+              <span className="text-2xl font-black text-indigo-600">${service.price}</span>
+            </div>
 
-          <div className="text-xs text-gray-600 space-y-2 mb-6 bg-gray-50 p-3 rounded-xl">
-            <div>⏱️ Delivery Time: <span className="font-bold">{serviceSample.delivery_time} Days</span></div>
-            <div>✔️ Full Source Code Included</div>
-            <div>✔️ Responsive Layout Setup</div>
-          </div>
+            <ul className="space-y-2.5 text-xs font-bold text-gray-500 mb-6">
+              <li className="flex items-center gap-2">⏱️ Delivery Time: <span className="text-gray-900">{service.delivery_time}</span></li>
+            </ul>
 
-          <button 
-            onClick={() => alert('Order generated! (Internship Mockup)')}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 rounded-xl transition-all"
-          >
-            Order Now
-          </button>
+            <button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black text-xs uppercase tracking-widest py-3 rounded-xl shadow-sm transition-all mb-3">
+              Continue Checkout (${service.price})
+            </button>
+          </div>
         </div>
-
       </div>
     </div>
   );

@@ -1,12 +1,13 @@
 <?php
 
-// app/Services/AuthService.php
+
 namespace App\Services;
 
 use App\Models\User;
 use App\Events\UserRegistered;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class AuthService
 {
@@ -18,6 +19,7 @@ class AuthService
                 'name' => $data['name'],
                 'email' => $data['email'],
                 'password' => Hash::make($data['password']),
+                'role' => $data['role'],
             ]);
 
             

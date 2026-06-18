@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Http\Requests\RegisterRequest;
-use App\Services\AuthService;
 use App\Http\Requests\LoginRequest;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Services\AuthService;
+
 
 class AuthController extends Controller
 {
@@ -40,7 +40,7 @@ class AuthController extends Controller
         
         if (!$result) {
             return response()->json([
-                'message' => 'Email ya password ghalat hai.'
+                'message' => 'Email or Password Wrong'
             ], 401); 
         }
 

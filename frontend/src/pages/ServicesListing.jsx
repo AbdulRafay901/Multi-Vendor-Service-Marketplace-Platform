@@ -1,90 +1,116 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // 💡 1. Navigation ke liye import kiya
-import useFetchServices from '../hooks/useFetchServices';
-import LoadingSpinner from '../components/LoadingSpinner';
-import ErrorMessage from '../components/ErrorMessage';
-import SidebarFilter from '../components/SidebarFilter';
-import ServiceCard from '../components/ServiceCard';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ServicesListing = () => {
-  const { services, loading, error } = useFetchServices();
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState(''); // 💡 Live Search ki state
-  const navigate = useNavigate(); // 💡 2. Navigation ka instance banaya
+  const navigate = useNavigate();
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('All Categories');
+  const [searchQuery, setSearchQuery] = useState('');
 
-  if (loading) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} />;
+  const categories = [
+    'All Categories',
+    'Web Development',
+    'Graphic Design',
+    'Digital Marketing',
+    'Content Writing',
+    'Video Editing'
+  ];
 
-  // Dynamic Categories Extract logic
-  const categories = ['All', ...new Set(services.map(s => s.category).filter(Boolean))];
+  // Backend se data fetch karne ka logic
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/services');
+        const result = await response.json();
+        if (response.ok) {
+          setServices(result.data); // Backend se aane wala data
+        }
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, []);
 
-  // 💡 3. Category + Search Logic dono ko combine kiya (As per Screen #2 UI)
+  // Filtering Logic
   const filteredServices = services.filter(service => {
-    const matchesCategory = selectedCategory === 'All' || service.category === selectedCategory;
-    const matchesSearch = service.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          service.description?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'All Categories' || service.category === selectedCategory;
+    const matchesSearch = service.title.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
-        {/* 🔍 TOP CONTROLS (Figma Screen #2 ke mutabiq Search + Sort layout) */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
-          {/* Live Search Input */}
-          <div className="w-full md:w-1/2 relative flex items-center">
-            <span className="absolute left-3 text-gray-400 text-sm">🔍</span>
-            <input 
-              type="text" 
-              placeholder="Search services..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-4 py-2 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-indigo-500 font-medium"
-            />
-          </div>
-
-          {/* Sort Dropdown */}
-          <div className="flex items-center gap-2 self-end md:self-auto">
-            <span className="text-xs font-semibold text-gray-500">Sort by:</span>
-            <select className="bg-gray-50 border border-gray-200 rounded-xl px-3 py-1.5 text-xs font-bold text-gray-700 focus:outline-none">
-              <option>Latest</option>
-              <option>Popularity</option>
-              <option>Price: Low to High</option>
-            </select>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Search Header */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+        <input
+          type="text"
+          placeholder="Search services..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full sm:max-w-md bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500"
+        />
+        <div className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+          Showing <span className="text-gray-900">{filteredServices.length}</span> results
         </div>
+      </div>
 
-        {/* Main Content Layout */}
-        <div className="flex flex-col md:flex-row gap-8">
-          
-          {/* Sidebar Filter Component */}
-          <SidebarFilter 
-            categories={categories} 
-            selectedCategory={selectedCategory} 
-            onSelectCategory={setSelectedCategory} 
-          />
-
-          {/* Services Grid */}
-          <div className="w-full md:w-3/4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {filteredServices.length > 0 ? (
-                filteredServices.map(service => (
-                  <ServiceCard 
-                    key={service.id} 
-                    service={service} 
-                    // 💡 4. Card par click karte hi yeh user ko details page par le jayega
-                    onClick={() => navigate(`/services/${service.id}`)} 
-                  />
-                ))
-              ) : (
-                <div className="col-span-full text-center py-16 bg-white rounded-2xl border border-dashed border-gray-200">
-                  <p className="text-gray-400 font-medium text-sm">Service Not Found</p>
-                </div>
-              )}
-            </div>
+      <div className="flex flex-col lg:flex-row gap-8 text-left">
+        {/* Sidebar */}
+        <aside className="w-full lg:w-64 shrink-0">
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 shadow-sm">
+            <h3 className="text-xs font-black text-gray-900 uppercase tracking-widest border-b pb-3 mb-4">Categories</h3>
+            <ul className="space-y-1">
+              {categories.map((cat) => (
+                <li key={cat}>
+                  <button
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                      selectedCategory === cat ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
+        </aside>
 
+        {/* Services Grid */}
+        <div className="flex-grow">
+          {loading ? (
+            <div className="text-center py-20">Loading...</div>
+          ) : filteredServices.length === 0 ? (
+            <div className="text-center py-20 bg-white border rounded-2xl">No Records Found</div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+              {filteredServices.map((service) => (
+                <div 
+                  key={service.id}
+                  onClick={() => navigate(`/services/${service.id}`)}
+                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-indigo-200 transition-all cursor-pointer flex flex-col"
+                >
+                  <img 
+                    src={`http://127.0.0.1:8000/storage/${service.image}`} 
+                    alt={service.title} 
+                    className="w-full h-44 object-cover"
+                  />
+                  <div className="p-4 space-y-2 flex-grow">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase">{service.category} • {service.delivery_time}</div>
+                    <h3 className="font-bold text-sm leading-snug line-clamp-2">{service.title}</h3>
+                  </div>
+                  <div className="p-4 pt-0 border-t border-gray-50 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-gray-500">By Provider</span>
+                    <span className="text-sm font-black text-indigo-600">${service.price}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

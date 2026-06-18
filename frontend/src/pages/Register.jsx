@@ -9,21 +9,34 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [role, setRole] = useState('customer');
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic client-side validation for internship project
     if (password !== confirmPassword) {
       alert("Passwords match nahi ho rahe bahi!");
       return;
     }
 
-    if (name && email && password) {
-      alert(`Account Created Successfully!\nWelcome ${name}`);
-      navigate('/login'); // Account banne ke baad direct login page par send karenge
-    } else {
-      alert('Please fill all fields');
+    try {
+      const response = await fetch('http://127.0.0.1:8000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, password, password_confirmation: confirmPassword,role: role })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert("Account Created Successfully!");
+        navigate('/login');
+      } else {
+        
+        alert(data.message || "Registration Failed");
+      }
+    } catch (error) {
+      alert("Backend connection failed. Server check karo!");
     }
   };
 
@@ -105,6 +118,20 @@ const Register = () => {
               className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 placeholder-gray-400 font-medium focus:outline-none focus:border-indigo-500 transition-all"
             />
           </div>
+
+          <div className="space-y-1.5">
+    <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+      Register As
+    </label>
+    <select
+      value={role}
+      onChange={(e) => setRole(e.target.value)}
+      className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 font-medium focus:outline-none focus:border-indigo-500 transition-all"
+    >
+      <option value="customer">Customer</option>
+      <option value="provider">Service Provider</option>
+    </select>
+  </div>
 
           {/* Submit Button */}
           <div className="pt-2">
