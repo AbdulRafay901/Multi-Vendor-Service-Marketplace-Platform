@@ -4,42 +4,48 @@ import { useNavigate } from 'react-router-dom';
 const Login = () => {
   const navigate = useNavigate();
   
-  // Simple form states
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('customer'); // Default role matching backend structure
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     
-    // Simple validation alert internship demo ke liye
     if (email && password) {
-      alert(`Login Successful!\nEmail: ${email}`);
-      navigate('/'); // Login ke baad home page par redirect
+      // Simulating backend auth response payload
+      const userData = {
+        email: email,
+        role: role, // 'customer', 'provider', or 'admin'
+        token: 'mock-jwt-token-from-backend'
+      };
+
+      // Save to localStorage so all components can read the current role
+      localStorage.setItem('user', JSON.stringify(userData));
+      
+      alert(`Login Successful!\nLogged in as: ${role.toUpperCase()}`);
+      navigate('/'); 
+      window.location.reload(); // Refresh to let Navbar read the new state immediately
     } else {
-      alert('Please fill all fields');
+      alert('Please fill in all required fields.');
     }
   };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 sm:px-6 lg:px-8 bg-gray-50/50">
-      
-      {/* Login Card Wrapper - Fully Responsive */}
       <div className="max-w-md w-full space-y-8 bg-white p-6 sm:p-8 rounded-2xl border border-gray-200 shadow-sm">
         
-        {/* Header */}
         <div className="text-center">
           <h2 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
             Welcome Back
           </h2>
           <p className="mt-2 text-xs sm:text-sm text-gray-400 font-medium">
-            ServiceHub account mein login karein
+            Sign in to your ServiceHub account
           </p>
         </div>
 
-        {/* Form */}
         <form className="mt-8 space-y-4" onSubmit={handleLoginSubmit}>
           
-          {/* Email Input */}
+          {/* Email */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
               Email Address
@@ -54,13 +60,11 @@ const Login = () => {
             />
           </div>
 
-          {/* Password Input */}
+          {/* Password */}
           <div className="space-y-1.5">
-            <div className="flex justify-between items-center">
-              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
-                Password
-              </label>
-            </div>
+            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+              Password
+            </label>
             <input
               type="password"
               required
@@ -71,27 +75,28 @@ const Login = () => {
             />
           </div>
 
-          {/* Remember Me Checkbox */}
-          <div className="flex items-center justify-between pt-1">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-xs text-gray-500 font-medium select-none">
-                Remember me
-              </label>
-            </div>
+          {/* Role Selection Dropdown (Aligned with Backend Roles) */}
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+              Select Your Role
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-800 font-medium focus:outline-none focus:border-indigo-500 transition-all"
+            >
+              <option value="customer">Customer (Browse & Order)</option>
+              <option value="provider">Service Provider / Seller</option>
+              <option value="admin">System Administrator</option>
+            </select>
           </div>
 
-          {/* Submit Button */}
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 px-4 rounded-xl shadow-md shadow-indigo-100 transition-all active:scale-[0.99]"
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm py-3 px-4 rounded-xl shadow-md transition-all active:scale-[0.99]"
             >
-              Sign In 
+              Sign In
             </button>
           </div>
 
