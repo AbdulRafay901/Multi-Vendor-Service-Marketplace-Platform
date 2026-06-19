@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'; // 1. Import add kar diya
+import React, { useState, useEffect } from 'react'; 
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import HeroSection from './components/Home/HeroSection'; // Import kiya
+import HeroSection from './components/Home/HeroSection'; 
 import ServicesListing from './pages/ServicesListing';
 import ServiceDetails from './pages/ServiceDetails';
 import Login from './pages/Login';
@@ -22,7 +22,7 @@ function PublicHome() {
 
   return (
     <div>
-      <HeroSection /> {/* Hero section wapis add kar diya */}
+      <HeroSection />
       
       <div className="max-w-7xl mx-auto px-4 py-12">
         <h2 className="text-2xl font-black mb-6">Featured Services</h2>
@@ -54,6 +54,12 @@ function App() {
             <Route path="/services/:id" element={<ServiceDetails />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            
+            {/* 👇 YAHAN PE ADD KIYE HAIN DONO MISSING ROUTES 👇 */}
+            <Route path="/my-orders" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+            <Route path="/my-gigs" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
+            {/* 👆 ============================================ 👆 */}
+
             <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
             <Route path="/add-service" element={isAuthenticated ? <AddService /> : <Navigate to="/login" />} />
           </Routes>
