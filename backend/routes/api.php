@@ -33,13 +33,12 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::post('/service-requests', [ServiceRequestController::class, 'store']);
 
-    Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
-
-        Route::get('/stats', [AdminController::class, 'getDashboardStats']);
+   
+        
+        Route::get('admin/stats', [AdminController::class, 'getDashboardStats']);
         Route::get('/users', [AdminController::class, 'getUsers']);
         Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
-        
-    });
+    
 
     Route::middleware('role:provider')->group(function(){
 
