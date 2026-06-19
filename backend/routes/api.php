@@ -40,7 +40,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
     
 
-    Route::middleware('role:provider')->group(function(){
+    
 
         Route::get('/provider/stats', [ProviderController::class, 'getDashboardStats']);
         Route::post('/services', [ServiceController::class, 'store']);
@@ -48,7 +48,7 @@ Route::middleware('auth:sanctum')->group(function(){
         Route::get('/provider/requests', [ProviderController::class, 'getMyRequests']);
         Route::patch('/provider/requests/{id}/status', [ProviderController::class, 'updateStatus']);
 
-    });
+    
     Route::get('/customer/stats', [CustomerController::class, 'getDashboardStats']);
     Route::get('/customer/my-requests', [ServiceRequestController::class, 'myRequests']);
 });

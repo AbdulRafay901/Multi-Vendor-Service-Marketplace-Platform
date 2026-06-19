@@ -62,6 +62,16 @@ const Navbar = () => {
                 Provider Dashboard
               </Link>
             )}
+
+            {/* Admin ⭐ NEW */}
+            {isAuthenticated && userRole === 'admin' && (
+              <Link
+                to="admin/dashboard"
+                className="text-xs font-bold text-indigo-600 hover:underline tracking-wide"
+              >
+                Admin Dashboard
+              </Link>
+            )}
           </div>
 
           {/* Right Align: User Access Sessions Profiles */}

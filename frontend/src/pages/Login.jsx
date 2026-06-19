@@ -34,7 +34,7 @@ const Login = () => {
         if (data.role === 'admin') {
             navigate('/admin/dashboard');
         } else if (data.role === 'provider') {
-            navigate('/provider/dashboard');
+            navigate('/my-gigs');
         } else {
             navigate('/');
         }
