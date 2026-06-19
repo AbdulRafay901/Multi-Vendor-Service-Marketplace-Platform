@@ -20,10 +20,7 @@ Route::get('/services', [ServiceController::class, 'index']);
 
 Route::get('/services/{id}', [ServiceController::class, 'show']);
 
-
-
 Route::get('/provider/profile/{id}', [ProviderController::class, 'getProfile']);
-
 
 
 // Public Api ---------------------- End
