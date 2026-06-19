@@ -7,7 +7,7 @@ import {
 
 const API_BASE = 'http://127.0.0.1:8000';
 
-// ---------- Sidebar menu (icons match the look of screens 5 & 7) ----------
+// ---------- Sidebar menu ----------
 const MENU = {
   customer: [
     { label: 'Overview', icon: LayoutDashboard },
@@ -28,10 +28,7 @@ const MENU = {
   ],
 };
 
-// Status filter chips - matches the tab bar on screen 6 (My Requests page)
 const STATUS_FILTERS = ['All', 'Pending', 'Accepted', 'In Progress', 'Completed', 'Cancelled'];
-
-// Tabs that pull from the requests list (role-aware endpoint, filtered client-side)
 const REQUEST_DRIVEN_TABS = ['My Requests', 'Requests', 'Active Projects', 'Completed Projects', 'Earnings'];
 
 const STATUS_STYLES = {
@@ -92,7 +89,12 @@ const Dashboard = () => {
     total_earnings: 0, total_requests: 0, active_projects: 0, pending_requests: 0, completed_orders: 0, recent_orders: [],
   });
 
-  // Add New Service form (screen 8)
+  // Review & Rating States
+  const [rating, setRating] = useState(0);
+  const [feedback, setFeedback] = useState('');
+  const [reviewsList, setReviewsList] = useState([]);
+
+  // Add New Service form
   const [showServiceForm, setShowServiceForm] = useState(false);
   const [newService, setNewService] = useState({ title: '', category: '', description: '', price: '', delivery_time: '' });
   const [serviceImage, setServiceImage] = useState(null);
@@ -111,8 +113,6 @@ const Dashboard = () => {
     setLoading(false);
   };
 
-  // Single source of truth for My Requests / Requests / Active Projects /
-  // Completed Projects / Earnings - filtered client-side, no extra routes needed
   const fetchRequests = async () => {
     setLoading(true);
     try {
@@ -133,6 +133,56 @@ const Dashboard = () => {
     } catch (err) { console.error('Services fetch failed:', err); }
     setLoading(false);
   };
+
+  const fetchReviews = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/reviews`, { headers });
+      const result = await res.json();
+      if (res.ok) setReviewsList(result.data || []);
+    } catch (err) { console.error('Reviews fetch failed:', err); }
+    setLoading(false);
+  };
+
+  const submitReview = async (e) => {
+  e.preventDefault();
+  if (rating === 0) return alert("Please select a rating!");
+  
+  // 🔍 DEBUGGING: Yeh line console me print karegi ke order me kya kya data maujood hai
+  console.log("🔍 FULL SELECTED ORDER:", selectedOrder);
+
+  // Alag alag possible ways se ID nikalne ki koshish karein
+  const providerId = selectedOrder.provider_id || 
+                     selectedOrder.provider?.id || 
+                     selectedOrder.service?.provider_id || 
+                     selectedOrder.service?.user_id;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/reviews`, {
+      method: 'POST',
+      headers: { ...headers, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        order_id: selectedOrder.id,
+        provider_id: providerId, // 👈 Humne upar variable bana kar sahi ID pakdi hai
+        rating: rating,
+        comment: feedback, 
+      }),
+    });
+
+    if (res.ok) {
+      alert('Review submitted successfully!');
+      setSelectedOrder(null);
+      setRating(0);
+      setFeedback('');
+      fetchStats();
+      if (activeTab === 'Reviews') fetchReviews();
+    } else {
+      const errorData = await res.json();
+      console.error("❌ Validation Errors:", errorData);
+      alert(`Validation Error: ${JSON.stringify(errorData.errors)}`);
+    }
+  } catch (err) { console.error('Review submit failed:', err); }
+};
 
   const updateStatus = async (id, status) => {
     try {
@@ -162,9 +212,6 @@ const Dashboard = () => {
   const submitService = async (e) => {
     e.preventDefault();
     try {
-      // FormData (not JSON) is required so the image file is actually sent.
-      // Don't set a Content-Type header here - the browser adds the correct
-      // multipart boundary automatically.
       const formData = new FormData();
       formData.append('title', newService.title);
       formData.append('category', newService.category);
@@ -191,6 +238,7 @@ const Dashboard = () => {
     setStatusFilter('All');
     if (activeTab === 'Overview') fetchStats();
     else if (activeTab === 'My Services') fetchServices();
+    else if (activeTab === 'Reviews') fetchReviews();
     else if (REQUEST_DRIVEN_TABS.includes(activeTab)) fetchRequests();
   }, [activeTab]);
 
@@ -248,7 +296,7 @@ const Dashboard = () => {
       <main className="flex-grow p-6 md:p-10">
         <h1 className="text-2xl font-black uppercase mb-8">{activeTab}</h1>
 
-        {/* ===== Overview (screens 5 & 7) ===== */}
+        {/* ===== Overview ===== */}
         {activeTab === 'Overview' && (
           <div className="space-y-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -311,7 +359,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* ===== My Services (screen 8) ===== */}
+        {/* ===== My Services ===== */}
         {activeTab === 'My Services' && (
           <div className="space-y-5">
             <div className="flex justify-end">
@@ -435,7 +483,7 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* ===== My Requests / Requests / Active Projects / Completed Projects / Earnings (screen 6 style) ===== */}
+        {/* ===== Request Driven Tabs ===== */}
         {REQUEST_DRIVEN_TABS.includes(activeTab) && (
           <div className="space-y-5">
             {activeTab === 'Earnings' && (
@@ -501,12 +549,38 @@ const Dashboard = () => {
           </div>
         )}
 
-        {/* ===== Messages / Reviews ===== */}
+        {/* ===== Messages ===== */}
         {activeTab === 'Messages' && (
           <EmptyState title="No messages yet" subtitle="Conversations with providers will appear here." />
         )}
+
+        {/* ===== Dynamic Reviews Tab ===== */}
         {activeTab === 'Reviews' && (
-          <EmptyState title="No reviews yet" subtitle="Reviews will appear here once submitted." />
+          <div className="space-y-4 max-w-2xl">
+            {loading ? (
+              <div className="p-10 text-center text-xs text-gray-400">Loading...</div>
+            ) : reviewsList.length === 0 ? (
+              <EmptyState title="No reviews yet" subtitle="Reviews will appear here once submitted or received." />
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {reviewsList.map((rev) => (
+                  <div key={rev.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="font-black text-sm uppercase text-slate-800">
+                        {userRole === 'provider' ? rev.customer?.name : rev.provider?.name}
+                      </span>
+                      <div className="flex text-amber-500">
+                        {Array.from({ length: rev.rating }).map((_, i) => (
+                          <Star key={i} size={14} fill="currentColor" className="text-amber-500" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 bg-gray-50 p-3 rounded-xl">"{rev.feedback}"</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
 
         {/* ===== Profile Settings ===== */}
@@ -527,10 +601,10 @@ const Dashboard = () => {
         )}
       </main>
 
-      {/* ---------------- Details Modal ---------------- */}
+      {/* ---------------- Details Modal with Review Form ---------------- */}
       {selectedOrder && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white p-8 rounded-2xl w-full max-w-md shadow-2xl">
+          <div className="bg-white p-8 rounded-2xl w-full max-w-md shadow-2xl overflow-y-auto max-h-[90vh]">
             <h2 className="text-xl font-black mb-4">Order Details</h2>
             <div className="space-y-3 text-sm">
               <p>
@@ -558,7 +632,52 @@ const Dashboard = () => {
                 <StatusBadge status={selectedOrder.status} />
               </p>
             </div>
-            <button onClick={() => setSelectedOrder(null)} className="mt-8 w-full bg-slate-900 text-white py-3 rounded-xl font-bold">
+
+            {/* Conditionally Render Review Form for Customer if Status is Completed */}
+            {userRole === 'customer' && selectedOrder.status === 'Completed' && (
+              <div className="mt-6 pt-6 border-t border-gray-100 space-y-4">
+                <p className="text-[10px] font-bold uppercase text-gray-400">Rate this Service Provider</p>
+                
+                {/* Interactive Stars */}
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setRating(star)}
+                      className={`transition ${rating >= star ? 'text-amber-500' : 'text-gray-300'}`}
+                    >
+                      <Star size={22} fill={rating >= star ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
+
+                {/* Feedback Input */}
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-gray-400">Your Feedback</label>
+                  <textarea
+                    value={feedback}
+                    onChange={(e) => setFeedback(e.target.value)}
+                    className="w-full mt-1 border rounded-xl px-4 py-2 text-xs focus:outline-none focus:border-indigo-500"
+                    rows={3}
+                    placeholder="How was your experience working with this provider?"
+                  />
+                </div>
+
+                <button
+                  onClick={submitReview}
+                  disabled={rating === 0}
+                  className="w-full bg-indigo-600 disabled:bg-gray-300 text-white py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition"
+                >
+                  Submit Review
+                </button>
+              </div>
+            )}
+
+            <button 
+              onClick={() => { setSelectedOrder(null); setRating(0); setFeedback(''); }} 
+              className="mt-8 w-full bg-slate-900 text-white py-3 rounded-xl font-bold"
+            >
               Close
             </button>
           </div>
