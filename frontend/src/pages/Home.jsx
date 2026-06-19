@@ -112,6 +112,40 @@ const Home = () => {
   </div>
 </section>
 
+<section className="bg-gray-50 py-16">
+  <div className="max-w-7xl mx-auto px-4">
+    <h2 className="text-center text-3xl font-black mb-12">
+      Why Choose Us
+    </h2>
+
+    <div className="grid md:grid-cols-3 gap-8">
+      <div className="bg-white p-6 rounded-2xl shadow-sm">
+        <div className="text-4xl mb-4">⚡</div>
+        <h3 className="font-bold mb-2">Fast Delivery</h3>
+        <p className="text-gray-600">
+          Get your projects delivered quickly by skilled professionals.
+        </p>
+      </div>
+
+      <div className="bg-white p-6 rounded-2xl shadow-sm">
+        <div className="text-4xl mb-4">🛡️</div>
+        <h3 className="font-bold mb-2">Secure Payments</h3>
+        <p className="text-gray-600">
+          Safe and transparent payment process.
+        </p>
+      </div>
+
+      <div className="bg-white p-6 rounded-2xl shadow-sm">
+        <div className="text-4xl mb-4">⭐</div>
+        <h3 className="font-bold mb-2">Top Rated Experts</h3>
+        <p className="text-gray-600">
+          Work with trusted freelancers from different industries.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
 
 
 
