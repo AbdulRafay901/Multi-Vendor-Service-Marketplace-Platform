@@ -65,4 +65,26 @@ class ProviderController extends Controller
             ]
         ], 200);
     }
+
+    public function getDashboardStats()
+{
+    $providerId = auth()->id();
+    
+    // Stats calculation
+    $stats = [
+        'total_earnings' => \App\Models\ServiceRequest::whereHas('service', fn($q) => $q->where('user_id', $providerId))->sum('budget'),
+        'active_projects' => \App\Models\ServiceRequest::whereHas('service', fn($q) => $q->where('user_id', $providerId))->where('status', 'in_progress')->count(),
+        'pending_requests' => \App\Models\ServiceRequest::whereHas('service', fn($q) => $q->where('user_id', $providerId))->where('status', 'pending')->count(),
+        'completed_orders' => \App\Models\ServiceRequest::whereHas('service', fn($q) => $q->where('user_id', $providerId))->where('status', 'completed')->count(),
+    ];
+
+    // Recent 5 orders le aao
+    $recentOrders = \App\Models\ServiceRequest::whereHas('service', fn($q) => $q->where('user_id', $providerId))
+        ->with(['service', 'customer'])
+        ->latest()
+        ->take(5)
+        ->get();
+
+    return response()->json(['stats' => $stats, 'recent_orders' => $recentOrders]);
+}
 }

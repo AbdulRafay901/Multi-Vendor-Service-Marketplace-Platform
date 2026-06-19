@@ -33,7 +33,7 @@ class ProviderService
 
         // STRICT CHECK
         if ($order->service->user_id !== $providerId) {
-            throw new Exception("Aap sirf apne orders ka status update kar sakte hain.");
+            throw new Exception("Not Your Order");
         }
 
     

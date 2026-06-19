@@ -72,4 +72,15 @@ class ServiceController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+
+    public function myServices()
+{
+    // Sirf us provider ki services nikalo jo abhi login hai
+    $services = Service::where('user_id', auth()->id())->get();
+    
+    return response()->json([
+        'message' => 'Your services fetched successfully',
+        'data' => $services
+    ], 200);
+}
 }

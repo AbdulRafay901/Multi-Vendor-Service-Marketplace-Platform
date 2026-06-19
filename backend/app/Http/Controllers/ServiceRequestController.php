@@ -28,4 +28,16 @@ class ServiceRequestController extends Controller
             'data' => $serviceRequest
         ], 201);
     }
+
+   
+
+     public function myRequests(Request $request) 
+     {
+    
+         $requests = \App\Models\ServiceRequest::where('customer_id', $request->user()->id)
+                     ->with('service')
+                     ->get();
+
+         return response()->json(['data' => $requests]);
+     }
 }
