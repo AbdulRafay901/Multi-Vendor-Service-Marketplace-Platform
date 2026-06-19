@@ -146,6 +146,42 @@ const Home = () => {
   </div>
 </section>
 
+<section className="py-16 bg-white">
+  <div className="max-w-7xl mx-auto px-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+
+      <div>
+        <h3 className="text-4xl font-black text-indigo-600">
+          <Counter end={500} suffix="+" />
+        </h3>
+        <p className="text-gray-600 mt-2">Projects</p>
+      </div>
+
+      <div>
+        <h3 className="text-4xl font-black text-indigo-600">
+          <Counter end={200} suffix="+" />
+        </h3>
+        <p className="text-gray-600 mt-2">Freelancers</p>
+      </div>
+
+      <div>
+        <h3 className="text-4xl font-black text-indigo-600">
+          <Counter end={98} suffix="%" />
+        </h3>
+        <p className="text-gray-600 mt-2">Success Rate</p>
+      </div>
+
+      <div>
+        <h3 className="text-4xl font-black text-indigo-600">
+          <Counter end={24} suffix="/7" />
+        </h3>
+        <p className="text-gray-600 mt-2">Support</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
 
 
 
