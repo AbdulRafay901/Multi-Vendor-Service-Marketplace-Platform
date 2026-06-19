@@ -8,6 +8,7 @@ use App\Http\Controllers\ServiceRequestController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AdminController;
 
 
 
@@ -32,14 +33,19 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::post('/service-requests', [ServiceRequestController::class, 'store']);
 
+    Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin')->group(function () {
+
+        Route::get('/stats', [AdminController::class, 'getDashboardStats']);
+        Route::get('/users', [AdminController::class, 'getUsers']);
+        Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);
+        
+    });
+
     Route::middleware('role:provider')->group(function(){
 
-
         Route::get('/provider/stats', [ProviderController::class, 'getDashboardStats']);
-
         Route::post('/services', [ServiceController::class, 'store']);
         Route::get('/provider/services', [ServiceController::class, 'myServices']);
-
         Route::get('/provider/requests', [ProviderController::class, 'getMyRequests']);
         Route::patch('/provider/requests/{id}/status', [ProviderController::class, 'updateStatus']);
 

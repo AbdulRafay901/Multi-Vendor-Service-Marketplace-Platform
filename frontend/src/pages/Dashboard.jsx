@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, ClipboardList, MessageSquare, CheckCircle2,
-  Star, Settings, LogOut, Briefcase, Activity, Wallet, Plus,
+  Star, Settings, LogOut, Briefcase, Activity, Wallet, Plus, ImagePlus, X,
 } from 'lucide-react';
 
 const API_BASE = 'http://127.0.0.1:8000';
@@ -95,6 +95,8 @@ const Dashboard = () => {
   // Add New Service form (screen 8)
   const [showServiceForm, setShowServiceForm] = useState(false);
   const [newService, setNewService] = useState({ title: '', category: '', description: '', price: '', delivery_time: '' });
+  const [serviceImage, setServiceImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const headers = { Authorization: `Bearer ${userSession?.token}`, Accept: 'application/json' };
 
@@ -143,17 +145,43 @@ const Dashboard = () => {
     } catch (err) { console.error('Status update failed:', err); }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setServiceImage(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
+
+  const removeImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview);
+    setServiceImage(null);
+    setImagePreview(null);
+  };
+
   const submitService = async (e) => {
     e.preventDefault();
     try {
+      // FormData (not JSON) is required so the image file is actually sent.
+      // Don't set a Content-Type header here - the browser adds the correct
+      // multipart boundary automatically.
+      const formData = new FormData();
+      formData.append('title', newService.title);
+      formData.append('category', newService.category);
+      formData.append('description', newService.description);
+      formData.append('price', newService.price);
+      formData.append('delivery_time', newService.delivery_time);
+      if (serviceImage) formData.append('image', serviceImage);
+
       const res = await fetch(`${API_BASE}/api/services`, {
         method: 'POST',
-        headers: { ...headers, 'Content-Type': 'application/json' },
-        body: JSON.stringify(newService),
+        headers: { Authorization: `Bearer ${userSession?.token}`, Accept: 'application/json' },
+        body: formData,
       });
       if (res.ok) {
         setShowServiceForm(false);
         setNewService({ title: '', category: '', description: '', price: '', delivery_time: '' });
+        removeImage();
         fetchServices();
       }
     } catch (err) { console.error('Create service failed:', err); }
@@ -353,9 +381,24 @@ const Dashboard = () => {
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase text-gray-400">Service Image</label>
-                  <input type="file" className="w-full mt-1 text-xs" />
-                  {/* Image upload needs FormData/multipart instead of JSON - wire this
-                      up once the /api/services endpoint accepts file uploads */}
+                  {imagePreview ? (
+                    <div className="mt-2 relative inline-block">
+                      <img src={imagePreview} alt="Service preview" className="w-32 h-32 object-cover rounded-xl border" />
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="absolute -top-2 -right-2 bg-slate-900 text-white rounded-full w-6 h-6 flex items-center justify-center"
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="mt-1 flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl px-4 py-8 text-xs text-gray-400 cursor-pointer hover:border-indigo-400 hover:text-indigo-500 transition">
+                      <ImagePlus size={20} />
+                      Click to upload an image
+                      <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+                    </label>
+                  )}
                 </div>
                 <button type="submit" className="bg-indigo-600 text-white font-bold text-xs uppercase px-6 py-3 rounded-xl">
                   Create Service
@@ -369,12 +412,24 @@ const Dashboard = () => {
               <EmptyState title="No services yet" subtitle="Add a service so customers can find and order from you." />
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {servicesList.map((s) => (
-                  <div key={s.id} className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm">
-                    <p className="font-black text-sm">{s.title}</p>
-                    <p className="text-xs text-gray-400 mt-1">From ${s.price} • {s.delivery_time} Days</p>
-                  </div>
-                ))}
+                {servicesList.map((s) => {
+                  const imageSrc = s.image_url || (s.image ? `${API_BASE}/storage/${s.image}` : null);
+                  return (
+                    <div key={s.id} className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
+                      {imageSrc ? (
+                        <img src={imageSrc} alt={s.title} className="w-full h-32 object-cover" />
+                      ) : (
+                        <div className="w-full h-32 bg-gray-50 flex items-center justify-center text-gray-300">
+                          <ImagePlus size={24} />
+                        </div>
+                      )}
+                      <div className="p-5">
+                        <p className="font-black text-sm">{s.title}</p>
+                        <p className="text-xs text-gray-400 mt-1">From ${s.price} • {s.delivery_time} Days</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

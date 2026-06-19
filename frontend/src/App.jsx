@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AddService from './pages/AddService';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   const userSession = JSON.parse(localStorage.getItem('user'));
@@ -32,7 +33,12 @@ function App() {
             <Route path="/my-orders" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
             <Route path="/my-gigs" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
             <Route path="/dashboard" element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />} />
-            <Route path="/add-service" element={isAuthenticated ? <AddService /> : <Navigate to="/login" />} />
+            <Route path="/add-service" element={isAuthenticated ? <AddService /> : <Navigate to="/login" />} 
+            />
+            <Route 
+  path="/admin/dashboard" 
+  element={userSession?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/login" />} 
+/>
           </Routes>
         </main>
         <Footer />
