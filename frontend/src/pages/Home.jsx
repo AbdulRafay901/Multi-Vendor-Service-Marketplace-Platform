@@ -182,7 +182,24 @@ const Home = () => {
   </div>
 </section>
 
+<section className="bg-indigo-600 py-20">
+  <div className="max-w-4xl mx-auto text-center px-4">
+    <h2 className="text-4xl font-black text-white mb-4">
+      Ready To Start Your Next Project?
+    </h2>
 
+    <p className="text-indigo-100 mb-8">
+      Connect with talented freelancers and bring your ideas to life.
+    </p>
+
+    <button
+      onClick={() => navigate('/services')}
+      className="bg-white text-indigo-600 px-8 py-3 rounded-xl font-bold"
+    >
+      Explore Services
+    </button>
+  </div>
+</section>
 
 
 
