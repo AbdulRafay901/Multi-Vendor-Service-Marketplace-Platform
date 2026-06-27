@@ -9,6 +9,7 @@ use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ProfileController;
 
 
 
@@ -35,8 +36,8 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::post('/service-requests', [ServiceRequestController::class, 'store']);   
 
-   
-        
+    Route::put('/profile/update', [ProfileController::class, 'update']);
+
         Route::get('admin/stats', [AdminController::class, 'getDashboardStats']);
         Route::get('/users', [AdminController::class, 'getUsers']);
         Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus']);

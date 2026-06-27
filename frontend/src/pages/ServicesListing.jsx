@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Star } from 'lucide-react';
 
 const ServicesListing = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const ServicesListing = () => {
     'Video Editing'
   ];
 
-  // Backend se data fetch karne ka logic
+
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -29,13 +30,14 @@ const ServicesListing = () => {
       } catch (error) {
         console.error("Error fetching services:", error);
       } finally {
+        
         setLoading(false);
       }
     };
     fetchServices();
   }, []);
 
-  // Filtering Logic
+
   const filteredServices = services.filter(service => {
     const matchesCategory = selectedCategory === 'All Categories' || service.category === selectedCategory;
     const matchesSearch = service.title.toLowerCase().includes(searchQuery.toLowerCase());
@@ -88,27 +90,48 @@ const ServicesListing = () => {
             <div className="text-center py-20 bg-white border rounded-2xl">No Records Found</div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {filteredServices.map((service) => (
-                <div 
-                  key={service.id}
-                  onClick={() => navigate(`/services/${service.id}`)}
-                  className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-indigo-200 transition-all cursor-pointer flex flex-col"
-                >
-                  <img 
-                    src={`http://127.0.0.1:8000/storage/${service.image}`} 
-                    alt={service.title} 
-                    className="w-full h-44 object-cover"
-                  />
-                  <div className="p-4 space-y-2 flex-grow">
-                    <div className="text-[10px] font-bold text-gray-400 uppercase">{service.category} • {service.delivery_time}</div>
-                    <h3 className="font-bold text-sm leading-snug line-clamp-2">{service.title}</h3>
+              {filteredServices.map((service) => {
+                const avgRating = service.reviews_avg_rating ? Number(service.reviews_avg_rating).toFixed(1) : '0.0';
+                const totalReviews = service.reviews_count || 0;
+
+                return (
+                  <div 
+                    key={service.id}
+                    onClick={() => navigate(`/services/${service.id}`)}
+                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden hover:border-indigo-200 transition-all cursor-pointer flex flex-col justify-between"
+                  >
+                    <div>
+                      <img 
+                        src={`http://127.0.0.1:8000/storage/${service.image}`} 
+                        alt={service.title} 
+                        className="w-full h-44 object-cover"
+                      />
+                      <div className="p-4 space-y-2">
+                        <div className="text-[10px] font-bold text-gray-400 uppercase">
+                          {service.category} • {service.delivery_time} Days Delivery
+                        </div>
+                        <h3 className="font-bold text-sm leading-snug line-clamp-2 text-slate-800">
+                          {service.title}
+                        </h3>
+
+                        {/* ⭐ Rating UI Section */}
+                        <div className="flex items-center gap-1 text-amber-500 font-black text-xs pt-0.5">
+                          <Star size={13} fill="currentColor" className="text-amber-500" />
+                          <span>{avgRating}</span>
+                          <span className="text-gray-400 font-bold text-[11px]">
+                            ({totalReviews} {totalReviews === 1 ? 'review' : 'reviews'})
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 pt-3 border-t border-gray-50 flex items-center justify-between mt-auto">
+                      <span className="text-xs font-semibold text-gray-500">By Provider</span>
+                      <span className="text-sm font-black text-indigo-600">${service.price}</span>
+                    </div>
                   </div>
-                  <div className="p-4 pt-0 border-t border-gray-50 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-500">By Provider</span>
-                    <span className="text-sm font-black text-indigo-600">${service.price}</span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>

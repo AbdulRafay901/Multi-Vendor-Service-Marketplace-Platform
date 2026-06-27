@@ -28,4 +28,9 @@ class Service extends Model
     {
         return $this->hasMany(ServiceRequest::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'provider_id', 'user_id');
+    }
 }
